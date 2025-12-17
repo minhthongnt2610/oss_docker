@@ -1,0 +1,11 @@
+# Node
+node_modules/
+
+# Docker
+mysql_data/
+
+# Env
+.env
+
+# OS
+.DS_Store
