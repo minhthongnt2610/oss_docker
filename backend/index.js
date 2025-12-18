@@ -10,6 +10,14 @@ const db = mysql.createConnection({
     database: process.env.DB_NAME
 });
 
+db.connect(err => {
+    if (err) {
+        console.error("Lỗi kết nối MySQL:", err.message);
+        return;
+    }
+    console.log("Kết nối MySQL thành công");
+});
+
 app.get("/", (req, res) => {
     res.send("Backend NodeJS chạy trong Docker");
 });

@@ -4,28 +4,47 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "8080:80"
+      - "${FRONTEND_PORT}:80"
     depends_on:
       - backend
+    networks:
+      - app-network
 
   backend:
     build: ./backend
     ports:
-      - "3000:3000"
+      - "${BACKEND_PORT}:3000"
     environment:
-      DB_HOST: db
-      DB_USER: ossuser
-      DB_PASSWORD: osspass
-      DB_NAME: ossdb
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
 
   db:
     image: mysql:8.0
-    env_file:
-      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - app-network
+
+networks:
+  app-network:
 
 volumes:
   mysql_data:
